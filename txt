@@ -1,0 +1,266 @@
+# import streamlit as st
+# import schedule
+# import time
+# import random
+# import smtplib
+# from email.mime.text import MIMEText
+# from email.mime.multipart import MIMEMultipart
+# from twilio.rest import Client
+# import pywhatkit as kit
+# import pymysql
+
+# # Connect to the database
+# def connect_to_db():
+#     return pymysql.connect(
+#         host='localhost',
+#         port=3306,
+#         user='root',
+#         password='mysql',
+#         database='amigos',
+#     )
+
+def connect_to_db():
+    return pymysql.connect(
+        host ='localhost',
+        port = 3306,
+        user='root',
+        password='mysql',
+        database= 'amigos',
+    )
+
+
+
+# # Function to get phone numbers of employees
+# def get_phone_numbers():
+#     conn = connect_to_db()
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT number FROM AMS")
+#     numbers = [row[0] for row in cursor.fetchall()]
+#     conn.close()
+#     return numbers
+
+# # Function to get emails of employees
+# def get_emails():
+#     conn = connect_to_db()
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT email FROM AMS")
+#     emails = [row[0] for row in cursor.fetchall()]
+#     conn.close()
+#     return emails
+
+# # Function to send email notification
+# def send_email_notification(subject, body, recipient_email):
+#     sender_email = "wayne@nathandigital.com"
+#     sender_password = "Quk04296"
+
+#     for recipient in recipient_email:
+#         msg = MIMEMultipart()
+#         msg['From'] = sender_email
+#         msg['To'] = recipient
+#         msg['Subject'] = subject
+#         msg.attach(MIMEText(body, 'plain'))
+
+#         try:
+#             server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+#             server.starttls()
+#             server.login(sender_email, sender_password)
+#             server.send_message(msg)
+#             st.write(f"Email notification sent successfully to {recipient}.")
+#             server.quit()
+#         except Exception as e:
+#             st.error(f"Error sending email notification to {recipient}: {str(e)}")
+
+# # Function to send SMS notification
+# def send_sms_notification(message, phone_number):
+#     account_sid = 'AC5fe6d8ce6d37d9fc330b521a552338e4'
+#     auth_token = 'd6e66eb529512a1e2405e25d5973a8a5'
+#     client = Client(account_sid, auth_token)
+#     try:
+#         message = client.messages.create(
+#             body=message,
+#             from_='+14159939893',
+#             to=phone_number
+#         )
+#         st.write("SMS notification sent successfully.")
+#     except Exception as e:
+#         st.error("Error sending SMS notification: {}".format(str(e)))
+
+# # Function to send WhatsApp notification
+# def send_whatsapp_notification(message, phone_number):
+#     try:
+#         kit.sendwhatmsg_to_group("AB123CDEFGHijklmn", "Hey All!", 0, 0)
+#         kit.sendwhatmsg(phone_number, message, 0, 0)
+#         st.write("WhatsApp notification sent successfully.")
+#     except Exception as e:
+#         st.error("Error sending WhatsApp notification: {}".format(str(e)))
+
+# # Function to send notification based on the chosen method
+# def send_notification(notification_method, recipient_name, recipient_email, recipient_phone):
+#     if notification_method == "Email":
+#         send_email_notification("Check-in Reminder", message, recipient_email)
+#     elif notification_method == "SMS":
+#         send_sms_notification(message, recipient_phone)
+#     elif notification_method == "WhatsApp":
+#         send_whatsapp_notification(message, recipient_phone)
+
+# # Function to handle leave notifications
+# def send_leave_notification(employee_name, leave_date, group_members):
+#     message = f"{employee_name} will be on leave on {leave_date}."
+#     for member in group_members:
+#         send_notification("Email", None, [member.email], None)  # Assuming each member has an email attribute
+
+
+# # Main function to run scheduled tasks
+# def run_scheduler():
+#     st.title("Notification Scheduler")
+#     if st.button("Send Notification"):
+#         notification_method = st.selectbox("Choose notification method", ["Email", "SMS", "WhatsApp"])
+#         if notification_method == "Email":
+#             emails = get_emails()
+#             for email in emails:
+#                 send_notification(notification_method, None, [email], None)
+#         elif notification_method == "SMS" or notification_method == "WhatsApp":
+#             phone_numbers = get_phone_numbers()
+#             for phone_number in phone_numbers:
+#                 send_notification(notification_method, None, None, phone_number)
+#         st.success("Notifications sent successfully!")
+
+# # Define scheduler task
+# def schedule_notifications():
+#     schedule.every(2).minutes.do(run_scheduler)
+
+# if __name__ == "__main__":
+#     run_scheduler()
+
+#     # Start scheduler
+#     while True:
+#         schedule.run_pending()
+#         time.sleep(1)
+
+import streamlit as st
+import schedule
+import time
+import random
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from twilio.rest import Client
+import pywhatkit as kit
+import pymysql
+
+# Connect to the database
+def connect_to_db():
+    return pymysql.connect(
+        host='localhost',
+        port=3306,
+        user='root',
+        password='mysql',
+        database='amigos',
+    )
+
+# Function to get phone numbers of employees
+def get_phone_numbers():
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT number FROM AMS")
+    numbers = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return numbers
+
+# Function to get emails of employees
+def get_emails():
+    conn = connect_to_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT email FROM AMS")
+    emails = [row[0] for row in cursor.fetchall()]
+    conn.close()
+    return emails
+
+# Function to send email notification
+def send_email_notification(subject, body, recipient_email):
+    sender_email = "wayne@nathandigital.com"
+    sender_password = "Quk04296"
+
+    for recipient in recipient_email:
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = recipient
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        try:
+            server = smtplib.SMTP('smtp-mail.outlook.com', 587)
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.send_message(msg)
+            st.success(f"Email notification sent successfully to {recipient}.")
+            server.quit()
+        except Exception as e:
+            st.error(f"Error sending email notification to {recipient}: {str(e)}")
+
+# Function to send SMS notification
+def send_sms_notification(message, phone_number):
+    account_sid = 'AC5fe6d8ce6d37d9fc330b521a552338e4'
+    auth_token = 'd6e66eb529512a1e2405e25d5973a8a5'
+    client = Client(account_sid, auth_token)
+    try:
+        message = client.messages.create(
+            body=message,
+            from_='+14159939893',
+            to=phone_number
+        )
+        st.success("SMS notification sent successfully.")
+    except Exception as e:
+        st.error("Error sending SMS notification: {}".format(str(e)))
+
+# Function to send WhatsApp notification
+def send_whatsapp_notification(message, phone_number):
+    try:
+        kit.sendwhatmsg_to_group("AB123CDEFGHijklmn", "Hey All!", 0, 0)
+        kit.sendwhatmsg(phone_number, message, 0, 0)
+        st.success("WhatsApp notification sent successfully.")
+    except Exception as e:
+        st.error("Error sending WhatsApp notification: {}".format(str(e)))
+
+# Function to send notification based on the chosen method
+def send_notification(notification_method, recipient_name, recipient_email, recipient_phone):
+    if notification_method == "Email":
+        send_email_notification("Check-in Reminder", message, recipient_email)
+    elif notification_method == "SMS":
+        send_sms_notification(message, recipient_phone)
+    elif notification_method == "WhatsApp":
+        send_whatsapp_notification(message, recipient_phone)
+
+# Function to handle leave notifications
+def send_leave_notification(employee_name, leave_date, group_members):
+    message = f"{employee_name} will be on leave on {leave_date}."
+    for member in group_members:
+        send_notification("Email", None, [member.email], None)  
+        st.info(f"{message} Notification sent to {member.name}.")  
+
+# Main function to run scheduled tasks
+def run_scheduler():
+    st.title("Notification Scheduler")
+    if st.button("Send Notification"):
+        notification_method = st.selectbox("Choose notification method", ["Email", "SMS", "WhatsApp"])
+        if notification_method == "Email":
+            emails = get_emails()
+            for email in emails:
+                send_notification(notification_method, None, [email], None)
+        elif notification_method == "SMS" or notification_method == "WhatsApp":
+            phone_numbers = get_phone_numbers()
+            for phone_number in phone_numbers:
+                send_notification(notification_method, None, None, phone_number)
+        st.success("Notifications sent successfully!")
+
+# Define scheduler task
+def schedule_notifications():
+    schedule.every(2).minutes.do(run_scheduler)
+
+if __name__ == "__main__":
+    run_scheduler()
+
+    # Start scheduler
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
